@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Call
 import java.net.ConnectException
+import java.net.UnknownHostException
 
 sealed class Result<T: Any>
 
@@ -24,8 +25,13 @@ var moshi: Moshi = Moshi
 suspend fun <T: Any> Call<T>.executeForResult(): Result<T> = withContext(Dispatchers.IO) {
     val response = try {
         execute()
-    } catch (e: ConnectException) {
-        return@withContext NetworkError("Unable to reach server")
+    } catch (e: Exception) {
+        val error = when(e) {
+            is ConnectException ->"Unable to reach server"
+            is UnknownHostException -> "Unable to reach server"
+            else -> "Unknown Exception"
+        }
+        return@withContext NetworkError(error)
     }
     val body = response.body()
     if (body != null) return@withContext Success(body)

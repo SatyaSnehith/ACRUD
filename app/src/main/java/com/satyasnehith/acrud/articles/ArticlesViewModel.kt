@@ -1,21 +1,24 @@
-package com.satyasnehith.acrud
+package com.satyasnehith.acrud.articles
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.satyasnehith.acrud.articles.ArticlesState
-import com.satyasnehith.acrud.articles.CallState
 import com.satyasnehith.acud.core.network.Failure
 import com.satyasnehith.acud.core.network.NetworkError
 import com.satyasnehith.acud.core.network.Success
 import com.satyasnehith.acud.core.network.api.ArticlesService
 import com.satyasnehith.acud.core.network.executeForResult
-import com.satyasnehith.acud.core.network.model.Article
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+
 @HiltViewModel
-class MainViewModel @Inject constructor (
+class ArticlesViewModel @Inject constructor (
     private var articlesService: ArticlesService
 ): ViewModel() {
-    val articlesState = ArticlesState()
+    val articlesState = ArticlesState(
+        callState = mutableStateOf(CallState.LOADING),
+//        articlesListState = FakeData.articles,
+//        noContentText = mutableStateOf("No Content")
+    )
 
     suspend fun getArticles() {
         articlesState.callState.value = CallState.LOADING
@@ -44,8 +47,6 @@ class MainViewModel @Inject constructor (
         
     }
 
-    suspend fun addArticle(article: Article) =
-        articlesService.addArticle(article).executeForResult()
 
 
 }

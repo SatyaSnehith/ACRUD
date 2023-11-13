@@ -27,15 +27,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.satyasnehith.acrud.CancellableToast
 import com.satyasnehith.acrud.components.ArticleTextField
 import com.satyasnehith.acud.core.network.Failure
-import com.satyasnehith.acud.core.network.Result
 import com.satyasnehith.acud.core.network.Success
 import com.satyasnehith.acud.core.network.model.Article
-import com.satyasnehith.acud.core.network.model.SuccessRes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -43,8 +41,8 @@ import timber.log.Timber
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddArticle(
-    navController: NavController = NavHostController(LocalContext.current),
-    onAdd: suspend (Article) -> Result<SuccessRes> = { Success(SuccessRes("s")) }
+    popBackStack: () -> Unit = {},
+    viewModel: AddArticleViewModel = hiltViewModel()
 ) {
     val titleValue = rememberSaveable {
         mutableStateOf("")
@@ -75,7 +73,7 @@ fun AddArticle(
             ExtendedFloatingActionButton(
                 onClick = {
                     coroutineScope.launch(Dispatchers.Main) {
-                        val result = onAdd(
+                        val result = viewModel.addArticle(
                             Article(
                                 id = null,
                                 title = titleValue.value,
@@ -84,7 +82,7 @@ fun AddArticle(
                         )
                         val toastMessage = when(result) {
                             is Success ->  {
-                                navController.popBackStack()
+                                popBackStack()
                                 result.data.message
                             }
                             is Failure -> {

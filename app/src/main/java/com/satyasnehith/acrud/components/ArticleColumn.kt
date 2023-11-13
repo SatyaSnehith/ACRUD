@@ -26,14 +26,15 @@ import com.satyasnehith.acud.core.network.model.Article
 @Composable
 fun ArticleList(
     articlesState: SnapshotStateList<Article>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onItemClicked: (Article) -> Unit = {}
 ) {
     LazyColumn(modifier = modifier) {
         items(articlesState) {
             ArticleItem(
                 it,
             ) {
-//                itemCount++
+                onItemClicked(it)
             }
         }
     }
