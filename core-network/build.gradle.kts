@@ -46,9 +46,12 @@ dependencies {
     implementation(libs.moshi)
     kapt(libs.moshi.codegen)
 
+    implementation(libs.timber)
+
     implementation(libs.retrofit)
     implementation(libs.converter.moshi)
     implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)

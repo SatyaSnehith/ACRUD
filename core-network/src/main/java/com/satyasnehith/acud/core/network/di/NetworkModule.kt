@@ -1,16 +1,19 @@
 package com.satyasnehith.acud.core.network.di
 
 import com.satyasnehith.acud.core.network.api.ArticlesService
+import com.satyasnehith.acud.core.network.moshi
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import timber.log.Timber
 import javax.inject.Singleton
+
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -18,8 +21,17 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    fun providesHttpLoggingInterceptor(): HttpLoggingInterceptor {
+        val logging = HttpLoggingInterceptor { message -> Timber.tag("OkHttp").d(message) }
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY)
+        return logging
+    }
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(httpLoggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
+            .addInterceptor(httpLoggingInterceptor)
             .build()
     }
 
@@ -42,9 +54,6 @@ class NetworkModule {
     @Provides
     @Singleton
     fun providesMoshi(): Moshi {
-        return Moshi
-            .Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
+        return moshi
     }
 }

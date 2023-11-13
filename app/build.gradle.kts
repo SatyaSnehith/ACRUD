@@ -1,6 +1,6 @@
 import com.satyasnehith.acrud.buildSrc.Configuration
 
-Suppress("DSL_SCOPE_VIOLATION")
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     kotlin("kapt")
     id(libs.plugins.android.application.get().pluginId)
@@ -43,6 +43,7 @@ android {
         jvmTarget = "17"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
     composeOptions {
@@ -60,6 +61,7 @@ android {
 
 dependencies {
     implementation(project(":core-network"))
+    implementation(libs.timber)
 
     implementation(libs.androidx.core.ktx)
 

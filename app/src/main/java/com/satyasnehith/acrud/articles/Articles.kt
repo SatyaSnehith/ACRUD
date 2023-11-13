@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.Scaffold
@@ -27,8 +26,8 @@ import com.satyasnehith.acud.core.network.model.Article
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Articles(
-    navController: NavController,
-    articlesState: SnapshotStateList<Article>
+    navController: NavController = NavHostController(LocalContext.current),
+    articlesState: SnapshotStateList<Article> = FakeData.articles
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
@@ -62,8 +61,5 @@ fun Articles(
 )
 @Composable
 fun GreetingPreview() {
-    Articles(
-        NavHostController(LocalContext.current),
-        articlesState = FakeData.articles
-    )
+    Articles()
 }
