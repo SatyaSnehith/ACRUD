@@ -3,6 +3,7 @@ package com.satyasnehith.acud.core.network.di
 import com.satyasnehith.acud.core.network.api.ArticlesService
 import com.satyasnehith.acud.core.network.moshi
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

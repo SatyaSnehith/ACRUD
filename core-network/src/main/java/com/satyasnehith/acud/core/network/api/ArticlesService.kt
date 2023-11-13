@@ -9,8 +9,8 @@ import retrofit2.http.POST
 
 interface ArticlesService {
     @GET("articles")
-    suspend fun getAllArticles(): Call<List<Article>>
+    fun getAllArticles(): Call<List<Article>>
 
     @POST("add")
-    suspend fun addArticle(@Body article: Article): Call<SuccessRes>
+    fun addArticle(@Body article: Article): Call<SuccessRes>
 }
