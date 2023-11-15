@@ -15,11 +15,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -28,21 +30,29 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.satyasnehith.acrud.CancellableToast
 import com.satyasnehith.acrud.components.ArticleTextField
-import com.satyasnehith.acud.core.network.Failure
-import com.satyasnehith.acud.core.network.Success
+import com.satyasnehith.acud.core.network.Result
 import com.satyasnehith.acud.core.network.model.Article
+import com.satyasnehith.acud.core.network.model.SuccessRes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+@Composable
+fun AddArticleRoute(
+    popBackStack: () -> Unit = {},
+    viewModel: AddArticleViewModel = hiltViewModel()
+) {
+    AddArticle(popBackStack, viewModel::addArticle)
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddArticle(
-    popBackStack: () -> Unit = {},
-    viewModel: AddArticleViewModel = hiltViewModel()
+    navigateBack: () -> Unit = {},
+    addArticle: suspend (Article) -> Result<SuccessRes> =
+        { Result.Success(SuccessRes("")) }
 ) {
     val titleValue = rememberSaveable {
         mutableStateOf("")
@@ -50,9 +60,11 @@ fun AddArticle(
     val bodyValue = rememberSaveable {
         mutableStateOf("")
     }
-    val coroutineScope = rememberCoroutineScope()
 
+    val coroutineScope = rememberCoroutineScope()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             CenterAlignedTopAppBar(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -66,6 +78,7 @@ fun AddArticle(
                         overflow = TextOverflow.Ellipsis
                     )
                 },
+                scrollBehavior = scrollBehavior
             )
         },
         floatingActionButton = {
@@ -73,7 +86,7 @@ fun AddArticle(
             ExtendedFloatingActionButton(
                 onClick = {
                     coroutineScope.launch(Dispatchers.Main) {
-                        val result = viewModel.addArticle(
+                        val result = addArticle(
                             Article(
                                 id = null,
                                 title = titleValue.value,
@@ -81,11 +94,11 @@ fun AddArticle(
                             )
                         )
                         val toastMessage = when(result) {
-                            is Success ->  {
-                                popBackStack()
+                            is Result.Success ->  {
+                                navigateBack()
                                 result.data.message
                             }
-                            is Failure -> {
+                            is Result.Failure -> {
                                 result.error
                             }
                         }
@@ -134,7 +147,6 @@ fun AddArticle(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview(
     showBackground = true,
     showSystemUi = true

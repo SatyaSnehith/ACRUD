@@ -56,4 +56,6 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
 
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.7.2")
+
 }

@@ -13,8 +13,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.satyasnehith.acrud.addarticle.AddArticle
-import com.satyasnehith.acrud.articles.Articles
+import com.satyasnehith.acrud.addarticle.AddArticleRoute
+import com.satyasnehith.acrud.articles.ArticlesRoute
 import com.satyasnehith.acrud.ui.theme.ACRUDTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -39,11 +39,11 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 NavHost(navController = navController, startDestination = "articles") {
                     composable("articles") {
-                        Articles(
+                        ArticlesRoute(
                             { navController.navigate(it) }
                         )
                     }
-                    composable("articles/add") { AddArticle({ navController.popBackStack() }) }
+                    composable("articles/add") { AddArticleRoute({ navController.popBackStack() }) }
                     composable("articles/view/id") { ViewArticle() }
                 }
             }

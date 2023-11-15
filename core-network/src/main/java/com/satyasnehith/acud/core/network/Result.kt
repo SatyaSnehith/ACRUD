@@ -9,13 +9,13 @@ import retrofit2.Call
 import java.net.ConnectException
 import java.net.UnknownHostException
 
-sealed class Result<T: Any>
+sealed class Result<T: Any> {
+    class Success<T: Any>(val data: T): Result<T>()
+    open class Failure<T: Any>(val error: String): Result<T>()
+    class NetworkError<T: Any>(error: String): Failure<T>(error)
+}
 
-class Success<T: Any>(val data: T): Result<T>()
 
-open class Failure<T: Any>(val error: String): Result<T>()
-
-class NetworkError<T: Any>(error: String): Failure<T>(error)
 
 var moshi: Moshi = Moshi
     .Builder()
@@ -31,11 +31,11 @@ suspend fun <T: Any> Call<T>.executeForResult(): Result<T> = withContext(Dispatc
             is UnknownHostException -> "Unable to reach server"
             else -> "Unknown Exception"
         }
-        return@withContext NetworkError(error)
+        return@withContext Result.NetworkError(error)
     }
     val body = response.body()
-    if (body != null) return@withContext Success(body)
-    val errorBody = response.errorBody() ?: return@withContext Failure("Unknown errorBody is null")
+    if (body != null) return@withContext Result.Success(body)
+    val errorBody = response.errorBody() ?: return@withContext Result.Failure("Unknown errorBody is null")
     val httpCode = response.code()
     val message = moshi
         .adapter(ErrorRes::class.java)
@@ -43,9 +43,9 @@ suspend fun <T: Any> Call<T>.executeForResult(): Result<T> = withContext(Dispatc
         ?.error
         .toString()
     return@withContext when(httpCode) {
-        400 -> Failure(message)
-        else -> Failure("Unknown")
+        400 -> Result.Failure(message)
+        else -> Result.Failure("Unknown")
     }
 }
 
-suspend fun <T: Any> Call<T>.executeForSuccessData(): T? = (executeForResult() as? Success)?.data
+suspend fun <T: Any> Call<T>.executeForSuccessData(): T? = (executeForResult() as? Result.Success)?.data

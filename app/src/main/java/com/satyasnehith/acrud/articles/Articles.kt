@@ -1,6 +1,8 @@
 package com.satyasnehith.acrud.articles
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -15,28 +17,51 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import com.satyasnehith.acrud.LogLifecycle
 import com.satyasnehith.acrud.components.ArticleColumnTopBar
 import com.satyasnehith.acrud.components.ArticleList
+import com.satyasnehith.acrud.data.FakeData
+import timber.log.Timber
+
+@Composable
+internal fun ArticlesRoute(
+    navigate: (String) -> Unit = {},
+    viewModel: ArticlesViewModel = hiltViewModel(),
+) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val articlesState by viewModel.articlesState.collectAsStateWithLifecycle(
+        initialValue = UiState.Loading,
+        lifecycle = lifecycleOwner.lifecycle,
+        minActiveState = Lifecycle.State.RESUMED,
+        context = lifecycleOwner.lifecycleScope.coroutineContext
+    )
+    LogLifecycle(name = "Articles")
+    Articles(articlesState, navigate)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Articles(
+    articlesState: UiState = UiState.Success(FakeData.articles),
     navigate: (String) -> Unit = {},
-    viewModel: ArticlesViewModel = hiltViewModel(),
 ) {
-    val articlesState = viewModel.articlesState
-    LaunchedEffect(Unit) {
-        viewModel.getArticles()
-    }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -56,32 +81,36 @@ fun Articles(
         Box(
             modifier = Modifier
                 .padding(paddingValues)
+                .fillMaxSize(),
         ) {
-            when(articlesState.callState.value) {
-                CallState.LOADING -> {
+            when(articlesState) {
+                is UiState.Loading -> {
                     CircularProgressIndicator(
                         modifier = Modifier
-                            .size(64.dp)
-                            .align(Alignment.Center),
-                        color = MaterialTheme.colorScheme.surfaceVariant,
+                            .align(Alignment.Center)
+                            .size(60.dp),
+                        color = MaterialTheme.colorScheme.primary,
                     )
                 }
-                CallState.CONTENT -> {
+                is UiState.Success -> {
                     ArticleList(
-                        articlesState.articlesListState,
-                        modifier = Modifier
-                            .padding(0.dp, 4.dp)
-                            .clipToBounds()
+                        articlesState.items,
                     ) {
                         navigate("articles/view/id")
                     }
                 }
-                CallState.NO_CONTENT -> {
-                    Text(text = articlesState.noContentText.value)
+                is UiState.Failure -> {
+                    Text(
+                        text = articlesState.message,
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Black,
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                    )
                 }
             }
         }
-
     }
 }
 
@@ -91,5 +120,14 @@ fun Articles(
 )
 @Composable
 fun GreetingPreview() {
+    Articles()
+}
+
+@Preview(
+    showSystemUi = true,
+    uiMode = UI_MODE_NIGHT_YES
+)
+@Composable
+fun GreetingPreviewDark() {
     Articles()
 }

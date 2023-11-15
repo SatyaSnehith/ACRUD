@@ -1,53 +1,43 @@
 package com.satyasnehith.acrud.articles
 
-import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.satyasnehith.acud.core.network.Failure
-import com.satyasnehith.acud.core.network.NetworkError
-import com.satyasnehith.acud.core.network.Success
+import androidx.lifecycle.viewModelScope
+import com.satyasnehith.acud.core.network.Result
 import com.satyasnehith.acud.core.network.api.ArticlesService
 import com.satyasnehith.acud.core.network.executeForResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
 class ArticlesViewModel @Inject constructor (
     private var articlesService: ArticlesService
 ): ViewModel() {
-    val articlesState = ArticlesState(
-        callState = mutableStateOf(CallState.LOADING),
-//        articlesListState = FakeData.articles,
-//        noContentText = mutableStateOf("No Content")
-    )
+    var articlesState = articlesFlow()
 
-    suspend fun getArticles() {
-        articlesState.callState.value = CallState.LOADING
+    private fun articlesFlow() = flow {
+        emit(UiState.Loading)
         val result = articlesService.getAllArticles().executeForResult()
-        var hasContent = false
-        when(result) {
-            is Success -> {
-                articlesState.addAll(result.data)
-                hasContent = result.data.isNotEmpty()
-                if (!hasContent) {
-                    articlesState.noContentText.value = "No Content"
+        emit(when(result) {
+            is Result.Success -> {
+                val items = result.data
+                 if (items.isEmpty()) {
+                    UiState.Failure("No Content")
+                } else {
+                    UiState.Success(items)
                 }
             }
-            is NetworkError -> {
-                articlesState.noContentText.value = "Server unreachable"
+            is Result.NetworkError -> {
+                UiState.Failure("Server unreachable")
             }
-            is Failure -> {
-                articlesState.noContentText.value = "Unexpected"
+            is Result.Failure -> {
+                UiState.Failure("Unexpected")
             }
-        }
-        if (hasContent) {
-            articlesState.callState.value = CallState.CONTENT
-        } else {
-            articlesState.callState.value = CallState.NO_CONTENT
-        }
-        
+        })
     }
-
-
-
 }
 
