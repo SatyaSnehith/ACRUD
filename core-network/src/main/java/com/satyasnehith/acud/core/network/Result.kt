@@ -1,6 +1,7 @@
 package com.satyasnehith.acud.core.network
 
 import com.satyasnehith.acud.core.network.model.ErrorRes
+import com.satyasnehith.acud.core.network.model.SuccessRes
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Dispatchers
@@ -15,19 +16,34 @@ sealed class Result<T: Any> {
     class NetworkError<T: Any>(error: String): Failure<T>(error)
 }
 
-
+fun Result<SuccessRes>.getMessage(): String {
+    return when (this) {
+        is Result.Success -> data.message
+        is Result.Failure -> error
+    }
+}
 
 var moshi: Moshi = Moshi
     .Builder()
     .add(KotlinJsonAdapterFactory())
     .build()
 
+inline fun <reified T : Any> fromJson(json: String): T? {
+    return try {
+        moshi
+            .adapter(T::class.java)
+            .fromJson(json)
+    }catch (e: Exception) {
+        null
+    }
+}
+
 suspend fun <T: Any> Call<T>.executeForResult(): Result<T> = withContext(Dispatchers.IO) {
     val response = try {
         execute()
     } catch (e: Exception) {
         val error = when(e) {
-            is ConnectException ->"Unable to reach server"
+            is ConnectException -> "Unable to reach server"
             is UnknownHostException -> "Unable to reach server"
             else -> "Unknown Exception"
         }
@@ -37,11 +53,7 @@ suspend fun <T: Any> Call<T>.executeForResult(): Result<T> = withContext(Dispatc
     if (body != null) return@withContext Result.Success(body)
     val errorBody = response.errorBody() ?: return@withContext Result.Failure("Unknown errorBody is null")
     val httpCode = response.code()
-    val message = moshi
-        .adapter(ErrorRes::class.java)
-        .fromJson(errorBody.string())
-        ?.error
-        .toString()
+    val message = fromJson<ErrorRes>(errorBody.toString())?.error ?: errorBody.toString()
     return@withContext when(httpCode) {
         400 -> Result.Failure(message)
         else -> Result.Failure("Unknown")

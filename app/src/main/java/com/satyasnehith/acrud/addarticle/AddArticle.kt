@@ -1,17 +1,17 @@
 package com.satyasnehith.acrud.addarticle
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -25,19 +25,20 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.satyasnehith.acrud.CancellableToast
 import com.satyasnehith.acrud.components.ArticleTextField
+import com.satyasnehith.acrud.components.ArticleTopBar
+import com.satyasnehith.acrud.ui.theme.ACRUDTheme
 import com.satyasnehith.acud.core.network.Result
+import com.satyasnehith.acud.core.network.getMessage
 import com.satyasnehith.acud.core.network.model.Article
 import com.satyasnehith.acud.core.network.model.SuccessRes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @Composable
 fun AddArticleRoute(
@@ -66,25 +67,27 @@ fun AddArticle(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            CenterAlignedTopAppBar(
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                    Text(
-                        text = "Add Article",
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                },
-                scrollBehavior = scrollBehavior
+            ArticleTopBar(
+                title = "Add Article",
+                addBackNavigation = navigateBack
             )
         },
         floatingActionButton = {
             val context = LocalContext.current
             ExtendedFloatingActionButton(
                 onClick = {
+                    val emptyType = when {
+                        titleValue.value.isEmpty() -> "title"
+                        bodyValue.value.isEmpty() -> "body"
+                        else -> null
+                    }
+                    if (emptyType != null) {
+                        CancellableToast.show(
+                            context,
+                            "Please enter the $emptyType"
+                        )
+                        return@ExtendedFloatingActionButton
+                    }
                     coroutineScope.launch(Dispatchers.Main) {
                         val result = addArticle(
                             Article(
@@ -93,20 +96,9 @@ fun AddArticle(
                                 body = bodyValue.value
                             )
                         )
-                        val toastMessage = when(result) {
-                            is Result.Success ->  {
-                                navigateBack()
-                                result.data.message
-                            }
-                            is Result.Failure -> {
-                                result.error
-                            }
-                        }
-                        Timber.d(toastMessage)
-                        Timber.tag("AddArticle").d(toastMessage)
-                        CancellableToast.show(context, toastMessage)
+                        CancellableToast.show(context, result.getMessage())
+                        if (result is Result.Success) navigateBack()
                     }
-
                 },
                 icon = {
                     Icon(
@@ -118,29 +110,30 @@ fun AddArticle(
             )
         }
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+        ) {
             ArticleTextField(
                 placeholder = "Title",
                 valueState = titleValue,
+                textCount = 128,
                 textStyle = TextStyle(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 24.sp
                 ),
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
             )
             Divider()
             ArticleTextField(
                 placeholder = "Body",
                 valueState = bodyValue,
+                textCount = 2048,
                 textStyle = TextStyle(
                     fontSize = 18.sp
                 ),
                 modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
-                    .fillMaxHeight()
+                    .defaultMinSize(minHeight = 300.dp)
                     .padding(bottom = 70.dp)
             )
         }
@@ -153,5 +146,19 @@ fun AddArticle(
 )
 @Composable
 fun AddArticlePreview() {
-    AddArticle()
+    ACRUDTheme {
+        AddArticle()
+    }
+}
+
+@Preview(
+    showBackground = true,
+    showSystemUi = true,
+    uiMode = UI_MODE_NIGHT_YES
+)
+@Composable
+fun AddArticlePreviewDark() {
+    ACRUDTheme {
+        AddArticle()
+    }
 }
