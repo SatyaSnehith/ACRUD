@@ -9,6 +9,7 @@ navigation = "2.7.5"
 activity-compose = "1.8.0"
 material3-compose = "1.1.2"
 lifecycle = "2.6.2"
+room = "2.6.0"
 timber = "5.0.1"
 hilt-navigation = "1.1.0"
 
@@ -21,6 +22,7 @@ androidx-junit = "1.1.5"
 compose-ui-test = "1.5.4"
 runner = "1.0.2"
 com-android-support-test-espresso-espresso-core = "3.0.2"
+truth = "1.1.5"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -41,6 +43,10 @@ androidx-compose-ui = { module = "androidx.compose.ui:ui" }
 androidx-compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation" }
+
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
@@ -64,3 +70,4 @@ androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4
 androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose-ui-test" }
 runner = { group = "com.android.support.test", name = "runner", version.ref = "runner" }
 espresso-core = { group = "com.android.support.test.espresso", name = "espresso-core", version.ref = "com-android-support-test-espresso-espresso-core" }
+truth = { module = "com.google.truth:truth", version.ref = "truth" }

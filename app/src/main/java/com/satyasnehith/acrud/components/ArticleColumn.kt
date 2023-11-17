@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.satyasnehith.acrud.data.FakeData
 import com.satyasnehith.acrud.ui.theme.ACRUDTheme
-import com.satyasnehith.acud.core.network.model.Article
+import com.satyasnehith.acrud.core.model.Article
 
 @Composable
 fun ArticleList(
@@ -68,14 +68,14 @@ fun ArticleItem(
 
         ) {
             Text(
-                text = article.title.orEmpty(),
+                text = article.title,
                 maxLines = 2,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = article.body.orEmpty(),
+                text = article.body,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier

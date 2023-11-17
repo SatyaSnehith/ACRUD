@@ -61,6 +61,10 @@ android {
 
 dependencies {
     implementation(project(":core-network"))
+    implementation(project(":core-database"))
+    implementation(project(":core-model"))
+    implementation(project(":core-data"))
+
     implementation(libs.timber)
 
     implementation(libs.androidx.core.ktx)

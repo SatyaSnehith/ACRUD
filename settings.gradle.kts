@@ -16,3 +16,6 @@ dependencyResolutionManagement {
 rootProject.name = "ACRUD"
 include(":app")
 include(":core-network")
+include(":core-database")
+include(":core-model")
+include(":core-data")

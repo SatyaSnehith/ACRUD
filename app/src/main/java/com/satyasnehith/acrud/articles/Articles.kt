@@ -34,7 +34,6 @@ import com.satyasnehith.acrud.components.ArticleTopBar
 import com.satyasnehith.acrud.components.ArticleList
 import com.satyasnehith.acrud.data.FakeData
 import com.satyasnehith.acrud.ui.theme.ACRUDTheme
-import timber.log.Timber
 
 @Composable
 internal fun ArticlesRoute(

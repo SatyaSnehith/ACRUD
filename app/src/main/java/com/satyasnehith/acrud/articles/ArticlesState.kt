@@ -1,6 +1,7 @@
 package com.satyasnehith.acrud.articles
 
-import com.satyasnehith.acud.core.network.model.Article
+import com.satyasnehith.acrud.core.model.Article
+
 
 sealed class UiState {
     class Success(val items: List<Article>): UiState()

@@ -1,7 +1,7 @@
 package com.satyasnehith.acrud.data
 
 import androidx.compose.runtime.mutableStateListOf
-import com.satyasnehith.acud.core.network.model.Article
+import com.satyasnehith.acrud.core.model.Article
 
 object FakeData {
     private val articleMap = hashMapOf(
@@ -31,6 +31,5 @@ object FakeData {
             )
         })
     }
-
 }
 

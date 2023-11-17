@@ -1,13 +1,9 @@
 package com.satyasnehith.acrud.viewartice
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.satyasnehith.acud.core.network.Result
-import com.satyasnehith.acud.core.network.api.ArticlesService
-import com.satyasnehith.acud.core.network.executeForResult
-import com.satyasnehith.acud.core.network.model.Article
+import com.satyasnehith.acrud.core.data.ArticlesRepository
+import com.satyasnehith.acrud.core.model.Article
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,27 +12,31 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class ViewArticleViewModel @Inject constructor(
-    private val articlesService: ArticlesService
+    private val articlesRepository: ArticlesRepository
 ): ViewModel() {
     var viewUiState: StateFlow<ViewUiState> = MutableStateFlow(ViewUiState.Loading)
 
     fun getArticleFlowState(id: Int) {
         viewUiState = flow {
             emit(ViewUiState.Loading)
-            val result = articlesService.getArticle(id).executeForResult()
-            emit(when(result) {
-                is Result.Success -> ViewUiState.Success(result.data)
-                is Result.Failure -> ViewUiState.Failure(result.error)
-            })
+            val result = articlesRepository.getArticle(id)
+            emit(if (result.isSuccess) {
+                    ViewUiState.Success(result.getOrNull()!!)
+                } else {
+                    ViewUiState.Failure(result.exceptionOrNull()?.message.orEmpty())
+                }
+            )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ViewUiState.Loading)
     }
 
     suspend fun deleteArticle(id: Int) = withContext(Dispatchers.IO) {
-        return@withContext articlesService.deleteArticle(id).executeForResult()
+        Timber.tag("DELETE").d(id.toString())
+        return@withContext articlesRepository.deleteArticle(id)
     }
 
 }

@@ -33,10 +33,7 @@ import com.satyasnehith.acrud.CancellableToast
 import com.satyasnehith.acrud.components.ArticleTextField
 import com.satyasnehith.acrud.components.ArticleTopBar
 import com.satyasnehith.acrud.ui.theme.ACRUDTheme
-import com.satyasnehith.acud.core.network.Result
-import com.satyasnehith.acud.core.network.getMessage
-import com.satyasnehith.acud.core.network.model.Article
-import com.satyasnehith.acud.core.network.model.SuccessRes
+import com.satyasnehith.acrud.core.model.Article
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -52,8 +49,7 @@ fun AddArticleRoute(
 @Composable
 fun AddArticle(
     navigateBack: () -> Unit = {},
-    addArticle: suspend (Article) -> Result<SuccessRes> =
-        { Result.Success(SuccessRes("")) }
+    addArticle: suspend (Article) -> Result<Unit> = { Result.success(Unit) }
 ) {
     val titleValue = rememberSaveable {
         mutableStateOf("")
@@ -91,13 +87,17 @@ fun AddArticle(
                     coroutineScope.launch(Dispatchers.Main) {
                         val result = addArticle(
                             Article(
-                                id = null,
+                                id = -1,
                                 title = titleValue.value,
                                 body = bodyValue.value
                             )
                         )
-                        CancellableToast.show(context, result.getMessage())
-                        if (result is Result.Success) navigateBack()
+                        CancellableToast.show(
+                            context,
+                            if (result.isSuccess) "Article added successfully"
+                            else "Unable to add article"
+                        )
+                        if (result.isSuccess) navigateBack()
                     }
                 },
                 icon = {

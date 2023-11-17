@@ -45,9 +45,6 @@ import com.satyasnehith.acrud.components.ArticleText
 import com.satyasnehith.acrud.components.ArticleTopBar
 import com.satyasnehith.acrud.data.FakeData
 import com.satyasnehith.acrud.ui.theme.ACRUDTheme
-import com.satyasnehith.acud.core.network.Result
-import com.satyasnehith.acud.core.network.getMessage
-import com.satyasnehith.acud.core.network.model.SuccessRes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -71,14 +68,12 @@ fun ViewArticleRoute(
     )
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ViewArticle(
     viewUiState: ViewUiState = ViewUiState.Success(FakeData.articles[0]),
     navigateBack: () -> Unit = {},
-    deleteArticle: suspend () -> Result<SuccessRes> =
-        { Result.Success(SuccessRes("Ok")) }
+    deleteArticle: suspend () -> Result<Unit> = { Result.success(Unit) }
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val coroutineScope = rememberCoroutineScope()
@@ -138,7 +133,7 @@ fun ViewArticle(
                             .verticalScroll(rememberScrollState())
                     ) {
                         ArticleText(
-                            text = article.title.orEmpty(),
+                            text = article.title,
                             textStyle = TextStyle(
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 24.sp
@@ -146,7 +141,7 @@ fun ViewArticle(
                         )
                         Divider()
                         ArticleText(
-                            text = article.body.orEmpty(),
+                            text = article.body,
                             textStyle = TextStyle(
                                 fontSize = 18.sp
                             ),
@@ -178,8 +173,8 @@ fun ViewArticle(
                 openAlertDialog.value = false
                 coroutineScope.launch(Dispatchers.Main) {
                     val result = deleteArticle()
-                    CancellableToast.show(context, result.getMessage())
-                    if (result is Result.Success) navigateBack()
+                    CancellableToast.show(context, if (result.isSuccess) "Article delete successfully" else "Unable to delete article")
+                    if (result.isSuccess) navigateBack()
                 }
             }
         )
