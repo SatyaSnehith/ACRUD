@@ -8,15 +8,13 @@ import com.satyasnehith.acrud.core.network.api.ArticlesService
 import timber.log.Timber
 
 class ArticlesRepository(
-    val articleDao: ArticleDao,
-    val articlesService: ArticlesService
+    private val articleDao: ArticleDao,
+    private val articlesService: ArticlesService
 ) {
     suspend fun getAllArticles(): Result<List<Article>> {
         return getResult {
-            articleDao.getAllArticles().asExternalModule().apply {
-                forEach {
-                    Timber.d(it.toString())
-                }
+            articleDao.getAllArticles().asExternalModule().onEach {
+                Timber.d(it.toString())
             }
         }
     }
@@ -43,6 +41,7 @@ class ArticlesRepository(
     }
 
     suspend fun updateArticle(article: Article): Result<Unit> {
+        Timber.tag("Update").d(article.toString())
         return getResult {
             articleDao.updateArticle(article.asArticleEntity())
         }

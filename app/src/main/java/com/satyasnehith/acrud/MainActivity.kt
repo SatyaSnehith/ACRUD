@@ -3,9 +3,11 @@ package com.satyasnehith.acrud
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.satyasnehith.acrud.addarticle.AddArticleRoute
 import com.satyasnehith.acrud.articles.ArticlesRoute
 import com.satyasnehith.acrud.ui.theme.ACRUDTheme
@@ -28,13 +30,31 @@ class MainActivity : ComponentActivity() {
                             { navController.navigate(it) }
                         )
                     }
-                    composable("articles/add") {
-                        AddArticleRoute({ navController.popBackStack() })
+                    composable(
+                        "articles/add"
+                        ) {
+                        AddArticleRoute(
+                            id = null,
+                            popBackStack = { navController.popBackStack() },
+                        )
                     }
-                    composable("articles/view/{id}") {
+                    composable(
+                        "articles/edit/{id}",
+                        arguments = listOf(navArgument("id") { type = NavType.IntType })
+                        ) {
+                        AddArticleRoute(
+                            id = it.arguments?.getInt("id") ?: return@composable,
+                            popBackStack = { navController.popBackStack() },
+                        )
+                    }
+                    composable(
+                        "articles/view/{id}",
+                        arguments = listOf(navArgument("id") { type = NavType.IntType })
+                    ) {
                         ViewArticleRoute(
-                            it.arguments?.getString("id")?.toIntOrNull() ?: return@composable,
-                            { navController.popBackStack() }
+                            id = it.arguments?.getInt("id") ?: return@composable,
+                            navigateBack = { navController.popBackStack() },
+                            navigate = { route -> navController.navigate(route) }
                         )
                     }
                 }

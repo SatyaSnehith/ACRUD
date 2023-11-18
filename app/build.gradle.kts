@@ -20,7 +20,7 @@ android {
         versionCode = Configuration.versionCode
         versionName = Configuration.versionName
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.satyasnehith.acrud.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -92,11 +92,15 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
 
+    implementation("org.mockito:mockito-android:5.7.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.truth)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation("org.mockito:mockito-android:5.7.0")
+    androidTestImplementation(libs.runner)
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.48.1")
+    kaptAndroidTest(libs.hilt.android.compiler)
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
     debugImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)

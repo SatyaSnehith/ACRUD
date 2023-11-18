@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,7 +53,8 @@ fun ArticleTextField(
                 .padding(16.dp, 16.dp)
                 .padding(top = 4.dp)
                 .fillMaxWidth()
-                .then(modifier),
+                .then(modifier)
+                .testTag(placeholder),
             textStyle = (
                     TextStyle(
                         color = colorScheme.onSurface

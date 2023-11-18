@@ -27,4 +27,6 @@ fun List<ArticleEntity>.asExternalModule() = map(ArticleEntity::asExternalModule
 fun Article.asArticleEntity() = ArticleEntity(
     title = title,
     body = body
-)
+).apply {
+    id = this@asArticleEntity.id
+}

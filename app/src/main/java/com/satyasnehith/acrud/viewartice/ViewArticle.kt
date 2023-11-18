@@ -52,6 +52,7 @@ import kotlinx.coroutines.launch
 fun ViewArticleRoute(
     id: Int,
     navigateBack: () -> Unit = {},
+    navigate: (String) -> Unit = {},
     viewModel: ViewArticleViewModel = hiltViewModel()
 ) {
 
@@ -64,6 +65,7 @@ fun ViewArticleRoute(
     ViewArticle(
         viewUiState = viewUiState,
         navigateBack = navigateBack,
+        onEditClicked = { navigate("articles/edit/${id}") },
         deleteArticle = { viewModel.deleteArticle(id) }
     )
 }
@@ -73,6 +75,7 @@ fun ViewArticleRoute(
 fun ViewArticle(
     viewUiState: ViewUiState = ViewUiState.Success(FakeData.articles[0]),
     navigateBack: () -> Unit = {},
+    onEditClicked: () -> Unit = {},
     deleteArticle: suspend () -> Result<Unit> = { Result.success(Unit) }
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -100,6 +103,7 @@ fun ViewArticle(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
+                    onEditClicked()
                 },
                 icon = {
                     Icon(
