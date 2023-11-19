@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -65,7 +64,7 @@ fun AddArticle(
     navigateBack: () -> Unit = {},
     addArticle: suspend (Article) -> Result<Unit> = { Result.success(Unit) },
     updateArticle: suspend (Article) -> Result<Unit> = { Result.success(Unit) },
-    getArticle: suspend (Int) -> Result<Article> = { Result.success(FakeData.articles.random()) },
+    getArticle: suspend (Int) -> Result<Article> = { Result.success(FakeData.articles[id ?: 0]) },
     toaster: Toaster = Toaster { }
 ) {
     val titleValue = rememberSaveable {
@@ -97,7 +96,7 @@ fun AddArticle(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             ArticleTopBar(
-                title = "${if (isEditMode) "Update" else "Add"} Article",
+                title = "${if (isEditMode) "Update" else "Add"} article",
                 addBackNavigation = navigateBack
             )
         },
@@ -117,7 +116,7 @@ fun AddArticle(
                     }
                     coroutineScope.launch(Dispatchers.Main) {
                         val article = Article(
-                            id = id ?: -1,
+                            id = id,
                             title = titleValue.value,
                             body = bodyValue.value
                         )

@@ -1,4 +1,4 @@
-package com.satyasnehith.acrud.articles
+package com.satyasnehith.acrud
 
 import android.util.Log
 import androidx.compose.ui.test.assertCountEquals
@@ -12,7 +12,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.performTextInput
 import androidx.test.filters.LargeTest
-import com.satyasnehith.acrud.MainActivity
 import com.satyasnehith.acrud.core.database.FakeData
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -29,7 +28,7 @@ class AddArticlesTest {
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
     @Test
-    fun addAllFakeArticleAndCheckInColumn() {
+    fun test_addAllFakeArticle_checkInColumn() {
         val articles = FakeData.articles
         articles.forEachIndexed { index, article ->
 //            val article = FakeData.articles.random()
@@ -44,7 +43,7 @@ class AddArticlesTest {
                 onNodeWithContentDescription("Send article").performClick()
             }
         }
-        Thread.sleep(1000)
+        Thread.sleep(100)
         composeTestRule.apply {
             val articlesColumn = onNodeWithTag("Articles")
             articlesColumn.performScrollToIndex(articles.lastIndex)

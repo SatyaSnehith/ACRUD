@@ -1,7 +1,5 @@
-package com.satyasnehith.acrud.articles.di
+package com.satyasnehith.acrud.di
 
-import com.satyasnehith.acrud.di.ToastModule
-import com.satyasnehith.acrud.di.Toaster
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent

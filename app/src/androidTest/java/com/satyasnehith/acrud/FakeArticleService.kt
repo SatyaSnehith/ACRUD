@@ -1,4 +1,4 @@
-package com.satyasnehith.acrud.articles
+package com.satyasnehith.acrud
 
 import com.satyasnehith.acrud.core.model.Article
 import com.satyasnehith.acrud.data.FakeData

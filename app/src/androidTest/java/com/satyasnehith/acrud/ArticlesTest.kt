@@ -1,4 +1,4 @@
-package com.satyasnehith.acrud.articles
+package com.satyasnehith.acrud
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
@@ -12,8 +12,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.printToLog
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
-import com.satyasnehith.acrud.MainActivity
-import com.satyasnehith.acrud.articles.di.FakeToaster
+import com.satyasnehith.acrud.di.FakeToaster
 import com.satyasnehith.acrud.core.database.FakeData
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -27,10 +26,10 @@ import org.junit.runners.MethodSorters
 @HiltAndroidTest
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class ArticlesTest {
-    @get:Rule
+    @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
-    @get:Rule
+    @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
     @Before
@@ -48,7 +47,7 @@ class ArticlesTest {
     fun test2_toastWithAddArticleWithoutTitle() {
         composeTestRule.onNodeWithContentDescription("Add article").performClick()
         composeTestRule.onNodeWithContentDescription("Send article").performClick()
-        assertThat(FakeToaster.toasts.first()).isEqualTo("Please enter the title")
+        assertThat(FakeToaster.toasts.last()).isEqualTo("Please enter the title")
     }
 
     @Test
@@ -56,7 +55,7 @@ class ArticlesTest {
         composeTestRule.onNodeWithContentDescription("Add article").performClick()
         composeTestRule.onNodeWithTag("Title").performTextInput("Sample title")
         composeTestRule.onNodeWithContentDescription("Send article").performClick()
-        assertThat(FakeToaster.toasts.first()).isEqualTo("Please enter the body")
+        assertThat(FakeToaster.toasts.last()).isEqualTo("Please enter the body")
     }
 
     @Test

@@ -28,5 +28,7 @@ fun Article.asArticleEntity() = ArticleEntity(
     title = title,
     body = body
 ).apply {
-    id = this@asArticleEntity.id
+    this@asArticleEntity.id?.let {
+        id = it
+    }
 }

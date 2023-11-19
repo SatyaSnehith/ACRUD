@@ -17,3 +17,8 @@ buildscript {
     dependencies {
     }
 }
+
+//task testAll(dependsOn: ['test', 'connectedAndroidTest']) {
+//    group = 'custom_tasks'
+//    description = "Run all tests"
+//}

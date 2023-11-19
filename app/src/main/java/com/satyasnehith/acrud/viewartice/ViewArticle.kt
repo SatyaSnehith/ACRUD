@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -142,6 +143,7 @@ fun ViewArticle(
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 24.sp
                             ),
+                            modifier = Modifier.testTag("Title")
                         )
                         Divider()
                         ArticleText(
@@ -151,6 +153,7 @@ fun ViewArticle(
                             ),
                             modifier = Modifier
                                 .padding(bottom = 70.dp)
+                                .testTag("Body")
                         )
                     }
                 }
