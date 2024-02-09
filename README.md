@@ -14,6 +14,11 @@
 - [Retrofit2 & OkHttp3](https://github.com/square/retrofit): Construct the REST APIs and paging network data.
 
 
+## Tests
+- Compose UI tests
+- Database tests
+
+
 ## Screenshots
 
 <div>
